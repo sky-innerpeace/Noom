@@ -23,11 +23,13 @@ const server = http.createServer(app); //내가 만든 http서버를 server에 �
 // 서버에서 ws 서버 구동시키기
 const wss = new WebSocket.Server({server}); // server를 ws 서버에 담기
 
+const sockets = [];
 
 // websocket event listener 등록
 // connection -> 새로운 연결
 // socket을 이용해 메시지 전달을 하므로 어딘가에 저장해야 함
 wss.on("connection", (socket) => {
+    sockets.push(socket);
     // connection이 생기면 socket을 받음
     // socket은 연결된 브라우저
 
@@ -37,8 +39,10 @@ wss.on("connection", (socket) => {
     socket.on("close", () => console.log("Disconnected from the Browser❌"));
     // 브라우저가 서버로 메시지를 보냈을 때 출력
     socket.on("message", (message) => {
-        const translatedMessageData = message.toString('utf8');
-    console.log(translatedMessageData);
+        sockets.forEach(aSocket => aSocket.send(message.toString('utf8')));
+        // const translatedMessageData = message.toString('utf8');
+        // console.log(translatedMessageData);
+        // socket.send(translatedMessageData);
     });
     // 브라우저로 메시지 전송
     socket.send("hello!");
